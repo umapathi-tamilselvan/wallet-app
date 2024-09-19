@@ -1,7 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+
+
+
+
     <div class="container" >
+
+        @if(Session::has('message'))
+        <p class="alert {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>
+        @endif
+
+
         <h1>Wallet</h1>
         <p>Balance: ${{ Auth::user()->account->balance }}</p>
 
@@ -11,7 +21,6 @@
         <form method="POST" action="{{ route('wallet.transfer') }}">
             @csrf
 
-            <!-- Dropdown for selecting the recipient -->
             <div class="form-group">
                 <label for="account_id">Select Recipient</label>
                 <select name="account_id" class="form-control" required>
@@ -26,13 +35,12 @@
                 </select>
             </div>
 
-            <!-- Amount Input -->
+
             <div class="form-group">
                 <label for="amount">Amount</label>
                 <input type="number" name="amount" class="form-control" required min="1">
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">Transfer Money</button>
         </form>
 

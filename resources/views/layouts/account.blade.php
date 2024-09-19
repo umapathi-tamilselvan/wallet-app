@@ -24,11 +24,6 @@
             </div>
             <button type="submit" class="btn btn-primary mt-2">Withdraw Money</button>
         </form>
-<div style="position: relative; height: 100vh;">
-    <a href="/home/account/transfer" class="btn btn-dark" style="position: absolute; bottom: 1165px; right: 10px;">Money Transfer</a>
-    <!-- Other content here -->
-</div>
-
 
     </div>
 @endsection

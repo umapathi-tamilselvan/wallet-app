@@ -13,19 +13,19 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
-                    {{ __('Welcome ') }} {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+                    <div class="text-uppercase">
+                            {{ __('Welcome ') }} {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+                    </div>
                     <br>
 
                    <div class="mt-4 font-weight-bold">
                        <p>Your wallet balance: ${{ auth()->user()->account->balance }}</p>
                    </div>
-                   <div class="d-flex justify-content-start mt-auto">
-                    <a href="/home/account" class="btn btn-primary" role="button">
-                       Wallet
-                    </a>
+                   <div class="align-center">
+                    <a href="/home/account" class="p-2 btn btn-primary">Credit/Debit</a>
+                    <a href="/home/account/transfer" class="p-2 btn btn-primary">Transfer Money</a>
+                  </div>
 
-                </div>
 
                 </div>
             </div>

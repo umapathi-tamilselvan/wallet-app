@@ -61,28 +61,29 @@ class AccountController extends Controller
             $reciptentAccount=Account::findOrFail($data['account_id']);
             if($senderAccount->balance<$data['amount'])
             {
-                return  redirect()->back()->with("Insufficient balance !");
+                return  redirect()->back()->with('error',"Insufficient balance !");
             }
-            DB::beginTransaction();
 
             $senderAccount->balance-=request()->input('amount');
             $senderAccount->save();
             $reciptentAccount->balance+=request()->input('amount');
             $reciptentAccount->save();
+
             Transaction::create([
                 'account_id' => $senderAccount->id,
                 'amount' => $data['amount'],
-                'type' => 'debit',  // Money debited from the sender's account
+                'type' => 'debit',
                 'description' => "Transfer to " . $reciptentAccount->user->name,
             ]);
             Transaction::create([
                 'account_id' => $senderAccount->id,
                 'amount' => $data['amount'],
-                'type' => 'credit',  // Money debited from the sender's account
+                'type' => 'credit',
                 'description' => "Transfer From " . $senderAccount->user->name,
             ]);
-            DB::commit();
-            return redirect()->back()->with("Sucessfully Transfered!");
+
+
+            return redirect()->back()->with('message', 'Rs.' .$data['amount'] .'/- Transferred successfully!');
 
         }
 
