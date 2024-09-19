@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <h1>Wallet</h1>
-        <p>Balance: ${{ Auth::user()->account->balance }}</p>
+        <p>Balance: ₹{{ Auth::user()->account->balance }}</p>
 
 
-        <form action="" method="POST">
+        <form action="/addmoney" method="POST">
             @csrf
             <div class="form-group" style="width: 500px;>
                 <label for="amount">Add Money:</label>
@@ -16,7 +16,7 @@
         </form>
 
 
-        <form action="#" method="POST" style="margin-top:20px;">
+        <form action="/withdraw" method="POST" style="margin-top:20px;">
             @csrf
             <div class="form-group" style="width: 500px;>
                 <label for="amount">Withdraw Money:</label>
@@ -25,10 +25,11 @@
             <button type="submit" class="btn btn-primary mt-2">Withdraw Money</button>
         </form>
 <div style="position: relative; height: 100vh;">
-    <a href="#" class="btn btn-dark" style="position: absolute; bottom: 1165px; right: 10px;">Money Transfer</a>
+    <a href="/home/account/transfer" class="btn btn-dark" style="position: absolute; bottom: 1165px; right: 10px;">Money Transfer</a>
     <!-- Other content here -->
 </div>
 
 
     </div>
 @endsection
+

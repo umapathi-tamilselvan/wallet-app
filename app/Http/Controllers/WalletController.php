@@ -16,10 +16,9 @@ class WalletController extends Controller
     public function account(){
         return view('layouts.account');
     }
-    public function addfund(Request $request){
-        $request->validate([
-            'amount'=>'required|numeric'
-        ]);
+   public function transfer(){
+       return view('layouts.transfer');
+   }
 
-    }
+
 }

@@ -1,13 +1,43 @@
-<form action="#" method="POST" style="margin-top:20px;">
-    @csrf
-    <div class="form-group " style="width: 500px;>
-        <label for="amount">Account:</label>
-        <input type="text" name="amount" class="form-control" required>
-    </div>
-    <div class="form-group " style="width: 500px;>
-        <label for="amount">Amount:</label>
-        <input type="number" name="amount" class="form-control" required>
-    </div>
-    <button type="submit" class="btn btn-warning mt-2">Transfer</button>
-</form>
+@extends('layouts.app')
 
+@section('content')
+    <div class="container" >
+        <h1>Wallet</h1>
+        <p>Balance: ${{ Auth::user()->account->balance }}</p>
+
+
+
+
+        <form method="POST" action="{{ route('wallet.transfer') }}">
+            @csrf
+
+            <!-- Dropdown for selecting the recipient -->
+            <div class="form-group">
+                <label for="account_id">Select Recipient</label>
+                <select name="account_id" class="form-control" required>
+                    <option value="">-- Select Recipient --</option>
+                    @foreach($users as $user)
+                        @if($user->id != Auth::user()->id)
+                            <option value="{{ $user->account->id }}">
+                                {{ $user->name }} (Account ID: {{ $user->account->id }}, Balance: {{ $user->account->balance }})
+                            </option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" name="amount" class="form-control" required min="1">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Transfer Money</button>
+        </form>
+
+
+
+
+    </div>
+@endsection
