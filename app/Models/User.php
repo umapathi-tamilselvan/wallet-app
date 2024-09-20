@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Wallet;
 use App\Models\Account;
+use App\Models\Transaction;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -48,7 +49,7 @@ class User extends Authenticatable
     public function account(){
         return $this->hasOne(Account::class);
     }
-    public function transaction(){
+    public function transactions(){
         return $this->hasMany(Transaction::class);
     }
 

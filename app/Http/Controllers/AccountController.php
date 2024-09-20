@@ -15,7 +15,7 @@ class AccountController extends Controller
     {
         $this->middleware('auth');
     }
-    public function addmoney(Account $account){
+    public function credit(Account $account){
         $data=request()->validate([
             'amount'=>'required|numeric',
         ]);
@@ -26,10 +26,10 @@ class AccountController extends Controller
             'account_id' => Auth::id(),
             'amount' => request()->input('amount'),
             'type' => 'credit']);
-        return redirect()->back();
+        return redirect('/home')->with('success','Successfully Credited!');
 
     }
-    public function withdraw(){
+    public function debit(){
         $data=request()->validate([
             'amount'=>'required|numeric',
         ]);
@@ -41,7 +41,7 @@ class AccountController extends Controller
                 'account_id' => Auth::id(),
                 'amount' => request()->input('amount'),
                 'type' => 'debit']);
-            return redirect()->back();
+                return redirect('/home')->with('message','Successfully Debited!');
 
     }
     public function showAccount(){
@@ -83,9 +83,16 @@ class AccountController extends Controller
             ]);
 
 
-            return redirect()->back()->with('message', 'Rs.' .$data['amount'] .'/- Transferred successfully!');
+            return redirect('/home')->with('su_cc', 'Rs.' .$data['amount'] .'/- Transferred successfully!');
 
         }
+        public function statement(){
+            $user = Auth::user();
+
+            $transactions = Transaction::where('account_id', $user->id)->get();
+            return view('layouts.statement',compact('transactions'));
+        }
+
 
 
     }

@@ -29,8 +29,8 @@ Route::get('/home/account',[WalletController::class,'account']);
 Route::get('/home/account/transfer',[WalletController::class,'transfer']);
 
 
-Route::post('/addmoney',[AccountController::class,'addmoney']);
-Route::post('/withdraw',[AccountController::class,'withdraw']);
+Route::post('/addmoney',[AccountController::class,'credit']);
+Route::post('/withdraw',[AccountController::class,'debit']);
 Route::get('/home/account/transfer', [AccountController::class, 'showAccount']);
 Route::post('/home/account/transfer', [AccountController::class, 'transfer'])->name('wallet.transfer');
-
+Route::get('/home/statement',[AccountController::class,'statement']);
