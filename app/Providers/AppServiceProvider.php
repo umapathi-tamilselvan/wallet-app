@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\Account;
 use App\Models\User;
-use App\Models\Wallet;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,10 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        User::created(function($user){
+        User::created(function ($user) {
             Account::create([
-                "user_id"=>$user->id,
-                'balance'=>0.0
+                'user_id' => $user->id,
+                'balance' => 0.0,
             ]);
         });
     }

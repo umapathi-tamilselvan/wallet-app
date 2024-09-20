@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Account;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -15,87 +14,90 @@ class AccountController extends Controller
     {
         $this->middleware('auth');
     }
-    public function credit(Account $account){
-        $data=request()->validate([
-            'amount'=>'required|numeric',
+
+    public function credit(Account $account)
+    {
+        $data = request()->validate([
+            'amount' => 'required|numeric',
         ]);
-        $account=Auth::user()->account;
-        $account->balance+=request()->input('amount');
-        $account->save();
+        $account = Auth::user()->account;
+        $account->balance += request()->input('amount');
+        $account->save();                                                               //used to validate,add amount and store the data to database;
         Transaction::create([
             'account_id' => Auth::id(),
             'amount' => request()->input('amount'),
-            'type' => 'credit']);
-        return redirect('/home')->with('success','Successfully Credited!');
-
-    }
-    public function debit(){
-        $data=request()->validate([
-            'amount'=>'required|numeric',
+            'type' => 'credit',
         ]);
-        $account=Auth::user()->account;
-        $account->balance-=request()->input('amount');
+
+        return redirect('/home')->with('success', 'Successfully Credited!');
+    }
+
+    public function debit()
+    {
+        $data = request()->validate([
+            'amount' => 'required|numeric',
+        ]);
+        $account = Auth::user()->account;
+        $account->balance -= request()->input('amount');                               //validate,debit amount and store;
         $account->save();
 
-            Transaction::create([
-                'account_id' => Auth::id(),
-                'amount' => request()->input('amount'),
-                'type' => 'debit']);
-                return redirect('/home')->with('message','Successfully Debited!');
+        Transaction::create([
+            'account_id' => Auth::id(),
+            'amount' => request()->input('amount'),
+            'type' => 'debit',
+        ]);
 
+        return redirect('/home')->with('message', 'Successfully Debited!');
     }
-    public function showAccount(){
+
+    public function showAccount()
+    {
 
         $users = User::with('account')->where('id', '!=', Auth::id())->get();
+
         return view('layouts.transfer', compact('users'));
     }
 
-        public function transfer(Request $request)
-        {
+    public function transfer(Request $request)
+    {
 
-            $data = $request->validate([
-                'account_id' => 'required|exists:accounts,id',
-                'amount' => 'required|numeric|min:1',
-            ]);
-            $senderAccount=Auth::user()->account;
-            $reciptentAccount=Account::findOrFail($data['account_id']);
-            if($senderAccount->balance<$data['amount'])
-            {
-                return  redirect()->back()->with('error',"Insufficient balance !");
-            }
-
-            $senderAccount->balance-=request()->input('amount');
-            $senderAccount->save();
-            $reciptentAccount->balance+=request()->input('amount');
-            $reciptentAccount->save();
-
-            Transaction::create([
-                'account_id' => $senderAccount->id,
-                'amount' => $data['amount'],
-                'type' => 'debit',
-                'description' => "Transfer to " . $reciptentAccount->user->name,
-            ]);
-            Transaction::create([
-                'account_id' => $senderAccount->id,
-                'amount' => $data['amount'],
-                'type' => 'credit',
-                'description' => "Transfer From " . $senderAccount->user->name,
-            ]);
-
-
-            return redirect('/home')->with('su_cc', 'Rs.' .$data['amount'] .'/- Transferred successfully!');
-
-        }
-        public function statement(){
-            $user = Auth::user();
-
-            $transactions = Transaction::where('account_id', $user->id)->get();
-            return view('layouts.statement',compact('transactions'));
+        $data = $request->validate([
+            'account_id' => 'required|exists:accounts,id',
+            'amount' => 'required|numeric|min:1',
+        ]);
+        $senderAccount = Auth::user()->account;
+        $reciptentAccount = Account::findOrFail($data['account_id']);
+        if ($senderAccount->balance < $data['amount']) {
+            return redirect()->back()->with('error', 'Insufficient balance !');
         }
 
+        $senderAccount->balance -= request()->input('amount');
+        $senderAccount->save();
+        $reciptentAccount->balance += request()->input('amount');
+        $reciptentAccount->save();
 
+        Transaction::create([
+            'account_id' => $senderAccount->id,
+            'amount' => $data['amount'],
+            'type' => 'debit',
+            'description' => 'Transfer to '.$reciptentAccount->user->name,
+        ]);
+        Transaction::create([
+            'account_id' => $senderAccount->id,
+            'amount' => $data['amount'],
+            'type' => 'credit',
+            'description' => 'Transfer From '.$senderAccount->user->name,
+        ]);
 
+        return redirect('/home')->with('su_cc', 'Rs.'.$data['amount'].'/- Transferred successfully!');
     }
 
+    public function statement()
+    {
+        $user = Auth::user();
 
+        $transactions = Transaction::where('account_id', $user->id)->get();
 
+        return view('layouts.statement', compact('transactions'));
+    }
+}
