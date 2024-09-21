@@ -2,32 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Account;
-use App\Models\Transaction;
 use App\Models\User;
+
+use App\Mail\DebitMail;
+use App\Models\Account;
+use App\Mail\CreditMail;
+use App\Mail\TransferMail;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AccountController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function credit(Account $account)
+    public function credit(Account $account, User $user)
     {
         $data = request()->validate([
             'amount' => 'required|numeric',
         ]);
-        $account = Auth::user()->account;
-        $account->balance += request()->input('amount');
-        $account->save();                                                               //used to validate,add amount and store the data to database;
+        $user=Auth::user();
+        $account = $user->account;
+        $account->balance += $data['amount'];
+        $account->save();
+        Mail::to($user->email)->send(new CreditMail($user,$data['amount']));
+                                                                    //used to validate,add amount and store the data to database;
         Transaction::create([
             'account_id' => Auth::id(),
-            'amount' => request()->input('amount'),
+            'amount' => $data['amount'],
             'type' => 'credit',
         ]);
+        $account->save();
+
 
         return redirect('/home')->with('success', 'Successfully Credited!');
     }
@@ -37,13 +48,14 @@ class AccountController extends Controller
         $data = request()->validate([
             'amount' => 'required|numeric',
         ]);
-        $account = Auth::user()->account;
-        $account->balance -= request()->input('amount');                               //validate,debit amount and store;
+        $user=Auth::user();
+        $account = $user->account;
+        $account->balance -= $data['amount'];                               //validate,debit amount and store;
         $account->save();
-
+        Mail::to($user->email)->send(new DebitMail($user,$data['amount']));
         Transaction::create([
             'account_id' => Auth::id(),
-            'amount' => request()->input('amount'),
+            'amount' => $data['amount'],
             'type' => 'debit',
         ]);
 
@@ -65,17 +77,18 @@ class AccountController extends Controller
             'account_id' => 'required|exists:accounts,id',
             'amount' => 'required|numeric|min:1',
         ]);
-        $senderAccount = Auth::user()->account;
+        $user=Auth::user();
+        $senderAccount = $user->account;
         $reciptentAccount = Account::findOrFail($data['account_id']);
         if ($senderAccount->balance < $data['amount']) {
             return redirect()->back()->with('error', 'Insufficient balance !');
         }
 
-        $senderAccount->balance -= request()->input('amount');
+        $senderAccount->balance -= $data['amount'];
         $senderAccount->save();
-        $reciptentAccount->balance += request()->input('amount');
+        $reciptentAccount->balance += $data['amount'];
         $reciptentAccount->save();
-
+        Mail::to($user)->send(new TransferMail($user,$data['amount'],$data['account_id']));
         Transaction::create([
             'account_id' => $senderAccount->id,
             'amount' => $data['amount'],
